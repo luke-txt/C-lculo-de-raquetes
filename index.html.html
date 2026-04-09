@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Raquete Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0f;--surface:#161618;--card:#1c1c1f;--border:#2a2a2e;--accent:#e8ff47;--accent2:#47c4ff;--accent3:#ff6b47;--text:#f0f0f0;--muted:#777;--success:#4dffa1;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:0 0 90px;overflow-x:hidden;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 18px 12px;position:sticky;top:0;z-index:200;}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.logo-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon svg{width:18px;height:18px;}
+h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);line-height:1;}
+.subtitle{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;gap:2px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:11px 13px;font-size:12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none;font-family:'DM Sans',sans-serif;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.page{display:none;padding:16px;}
+.page.active{display:block;}
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;animation:fadeUp .25s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.section-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.field{margin-bottom:12px;position:relative;}
+.field:last-child{margin-bottom:0;}
+label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:500;}
+input[type="text"],input[type="number"],select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,255,71,.07);}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.autocomplete-wrap{position:relative;}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#222224;border:1px solid var(--border);border-radius:12px;max-height:210px;overflow-y:auto;z-index:400;box-shadow:0 8px 32px rgba(0,0,0,.6);scrollbar-width:thin;}
+.dropdown::-webkit-scrollbar{width:3px;}
+.dropdown::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.dropdown-item{padding:11px 14px;font-size:13px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:2px;}
+.dropdown-item:last-child{border-bottom:none;}
+.dropdown-item:hover{background:rgba(232,255,71,.08);}
+.item-main{color:var(--text);font-weight:500;}
+.item-sub{color:var(--muted);font-size:11px;}
+.dropdown-item mark{background:rgba(232,255,71,.22);color:var(--accent);border-radius:2px;padding:0 1px;font-style:normal;}
+.dropdown-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px;font-style:italic;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.chip{padding:5px 11px;border-radius:20px;font-size:12px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.chip.selected{background:rgba(232,255,71,.1);border-color:var(--accent);color:var(--accent);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;}
+.toggle-label{font-size:13px;color:var(--text);}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:24px;transition:.3s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#555;border-radius:50%;transition:.3s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider::before{background:#000;transform:translateX(20px);}
+.weight-display{background:linear-gradient(135deg,#1a1f00,#0d1200);border:1px solid var(--accent);border-radius:18px;padding:22px 18px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden;}
+.weight-display::before{content:'';position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:100px;height:100px;background:radial-gradient(circle,rgba(232,255,71,.13) 0%,transparent 70%);pointer-events:none;}
+.weight-label{font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+.weight-value{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;color:var(--accent);letter-spacing:2px;}
+.weight-unit{font-size:16px;color:rgba(232,255,71,.55);font-weight:300;}
+.weight-range{font-size:11px;color:var(--muted);margin-top:6px;}
+.weight-status{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;margin-top:10px;}
+.status-ok{background:rgba(77,255,161,.12);color:var(--success);}
+.status-light{background:rgba(71,196,255,.12);color:var(--accent2);}
+.status-heavy{background:rgba(255,107,71,.12);color:var(--accent3);}
+.breakdown-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.breakdown-item:last-child{border-bottom:none;}
+.breakdown-name{font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.breakdown-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.breakdown-value{font-size:13px;font-weight:600;}
+.breakdown-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.summary-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.summary-card-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+.summary-card-value{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.balance-display{background:linear-gradient(135deg,#001020,#00050d);border:1px solid var(--accent2);border-radius:14px;padding:16px;margin-bottom:12px;}
+.balance-bar-wrap{position:relative;height:18px;background:var(--border);border-radius:10px;margin:12px 0 5px;overflow:hidden;}
+.balance-bar-center{position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.15);transform:translateX(-50%);}
+.balance-indicator{position:absolute;top:2px;bottom:2px;width:14px;border-radius:8px;background:var(--accent2);transform:translateX(-50%);transition:left .5s cubic-bezier(.22,1,.36,1);}
+.balance-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);}
+.sim-result{background:linear-gradient(135deg,#001a1f,#000d12);border:1px solid var(--accent2);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;}
+.sim-label{font-size:9px;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;font-weight:600;margin-bottom:5px;}
+.sim-value{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--accent2);line-height:1;}
+.sim-diff{font-size:12px;margin-top:7px;font-weight:600;}
+.diff-plus{color:var(--accent3);}
+.diff-minus{color:var(--success);}
+.diff-zero{color:var(--muted);}
+.compare-bar{background:var(--bg);border-radius:8px;padding:12px;margin-bottom:8px;}
+.compare-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.compare-row:last-child{margin-bottom:0;}
+.compare-tag{font-size:10px;color:var(--muted);width:46px;flex-shrink:0;}
+.bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);}
+.bar-current{background:var(--accent);}
+.bar-sim{background:var(--accent2);}
+.compare-num{font-size:11px;font-weight:600;width:40px;text-align:right;flex-shrink:0;}
+.saved-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.saved-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.saved-item-name{font-size:14px;font-weight:600;}
+.saved-item-weight{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:1px;}
+.saved-item-details{font-size:11px;color:var(--muted);line-height:1.7;}
+.saved-item-date{font-size:10px;color:var(--muted);margin-top:4px;}
+.saved-actions{display:flex;gap:8px;margin-top:10px;}
+.btn-sm{padding:7px 14px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-load{background:rgba(232,255,71,.1);color:var(--accent);border:1px solid rgba(232,255,71,.2);}
+.btn-del{background:rgba(255,107,71,.1);color:var(--accent3);border:1px solid rgba(255,107,71,.2);}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--text);margin-top:8px;}
+.tip{background:rgba(232,255,71,.04);border:1px solid rgba(232,255,71,.12);border-radius:10px;padding:11px 13px;font-size:12px;color:rgba(240,240,240,.65);line-height:1.6;margin-top:10px;}
+.tip strong{color:var(--accent);}
+.hint{font-size:12px;color:var(--muted);text-align:center;padding:6px 0;line-height:1.5;}
+.history-item{padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px;border:1px solid var(--border);}
+.history-header{display:flex;justify-content:space-between;align-items:center;}
+.history-name{font-size:13px;font-weight:600;}
+.history-weight{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);}
+.history-date{font-size:10px;color:var(--muted);margin-top:3px;}
+.history-detail{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:13px;line-height:1.6;}
+.racket-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:14px;}
+.racket-tabs::-webkit-scrollbar{display:none;}
+.racket-tab-btn{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.racket-tab-btn.active{background:rgba(232,255,71,.1);border-color:var(--accent);color:var(--accent);}
+.racket-tab-btn.add-btn{border-style:dashed;}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 18px;z-index:200;}
+.bottom-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:9px;cursor:pointer;padding:5px 10px;border-radius:10px;transition:all .15s;text-transform:uppercase;letter-spacing:.5px;}
+.bottom-btn.active{color:var(--accent);}
+.bottom-btn svg{width:20px;height:20px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+        <ellipse cx="12" cy="12" rx="9" ry="5" transform="rotate(-45 12 12)"/>
+        <line x1="15.5" y1="15.5" x2="20" y2="20"/>
+      </svg>
+    </div>
+    <div>
+      <h1>RAQUETE SETUP</h1>
+      <div class="subtitle">Calculadora de peso & configuração</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="goTab('setup')">⚙️ Setup</button>
+  <button class="tab" onclick="goTab('resultado')">⚖️ Resultado</button>
+  <button class="tab" onclick="goTab('simulador')">🔬 Simulador</button>
+  <button class="tab" onclick="goTab('setups')">💾 Setups</button>
+  <button class="tab" onclick="goTab('historico')">📋 Histórico</button>
+</div>
+
+<!-- SETUP -->
+
+<div class="page active" id="page-setup">
+
+  <div class="section">
+    <div class="section-label">🎾 Raquetes</div>
+    <div class="racket-tabs" id="racket-tabs"></div>
+    <div class="field">
+      <label>Modelo da Raquete</label>
+      <div class="autocomplete-wrap">
+        <input type="text" id="raquete-modelo" placeholder="Ex: Wilson Pro Staff 97" oninput="filterDD(this,'dd-raquete',RAQUETES,'fillRaquete')" onblur="closeDD('dd-raquete')" autocomplete="off">
+        <div class="dropdown" id="dd-raquete" style="display:none"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Peso strung (g)</label>
+        <input type="number" id="raquete-peso" placeholder="315" oninput="calcular()">
+      </div>
+      <div class="field">
+        <label>Peso unstrung (g)</label>
+        <input type="number" id="raquete-peso-unstrung" placeholder="295" oninput="calcular()">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Head size (cm²)</label>
+        <input type="number" id="raquete-head" placeholder="645" oninput="calcular()">
+      </div>
+      <div class="field">
+        <label>Comprimento (cm)</label>
+        <input type="number" id="raquete-comprimento" placeholder="68.5" step="0.1" oninput="calcular()">
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:6px;padding:10px;font-size:12px;" onclick="novaRaquete()">＋ Adicionar outra raquete</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🎯 Corda</div>
+    <div class="field">
+      <label>Corda (marca / modelo)</label>
+      <div class="autocomplete-wrap">
+        <input type="text" id="corda-nome" placeholder="Ex: Babolat RPM Blast" oninput="filterDD(this,'dd-corda',CORDAS,'fillCorda')" onblur="closeDD('dd-corda')" autocomplete="off">
+        <div class="dropdown" id="dd-corda" style="display:none"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Bitola</label>
+        <select id="corda-bitola" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option>15 (1.40mm)</option><option>16 (1.30mm)</option>
+          <option>16L (1.27mm)</option><option>17 (1.25mm)</option><option>18 (1.20mm)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Material</label>
+        <select id="corda-material" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option value="poly">Polietileno</option><option value="nylon">Nylon/Sint.</option>
+          <option value="natural">Natural Gut</option><option value="hybrid">Híbrido</option>
+          <option value="multi">Multifilamento</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Peso da corda (g)</label>
+      <input type="number" id="corda-peso" placeholder="15" oninput="calcular()">
+      <div class="chips">
+        <div class="chip" onclick="setChip('corda-peso',13,this)">13g</div>
+        <div class="chip" onclick="setChip('corda-peso',14,this)">14g</div>
+        <div class="chip" onclick="setChip('corda-peso',15,this)">15g</div>
+        <div class="chip" onclick="setChip('corda-peso',16,this)">16g</div>
+        <div class="chip" onclick="setChip('corda-peso',17,this)">17g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tensão (lbs)</label>
+      <input type="number" id="corda-tensao" placeholder="55" oninput="calcular()">
+      <div class="chips">
+        <div class="chip" onclick="setChip('corda-tensao',48,this)">48</div>
+        <div class="chip" onclick="setChip('corda-tensao',50,this)">50</div>
+        <div class="chip" onclick="setChip('corda-tensao',52,this)">52</div>
+        <div class="chip" onclick="setChip('corda-tensao',55,this)">55</div>
+        <div class="chip" onclick="setChip('corda-tensao',58,this)">58</div>
+        <div class="chip" onclick="setChip('corda-tensao',60,this)">60</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🖐️ Cushion & Overgrip</div>
+    <div class="field">
+      <label>Cushion Grip (marca / modelo)</label>
+      <div class="autocomplete-wrap">
+        <input type="text" id="cushion-nome" placeholder="Ex: Wilson Pro Sensation" oninput="filterDD(this,'dd-cushion',CUSHIONS,'fillCushion')" onblur="closeDD('dd-cushion')" autocomplete="off">
+        <div class="dropdown" id="dd-cushion" style="display:none"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Peso do cushion (g)</label>
+      <input type="number" id="cushion-peso" placeholder="12" oninput="calcular()">
+      <div class="chips">
+        <div class="chip" onclick="setChip('cushion-peso',0,this)">Sem</div>
+        <div class="chip" onclick="setChip('cushion-peso',9,this)">9g</div>
+        <div class="chip" onclick="setChip('cushion-peso',10,this)">10g</div>
+        <div class="chip" onclick="setChip('cushion-peso',12,this)">12g</div>
+        <div class="chip" onclick="setChip('cushion-peso',14,this)">14g</div>
+        <div class="chip" onclick="setChip('cushion-peso',16,this)">16g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Overgrip (marca / modelo)</label>
+      <div class="autocomplete-wrap">
+        <input type="text" id="grip-nome" placeholder="Ex: Tourna Grip Original" oninput="filterDD(this,'dd-grip',OVERGRIPS,'fillGrip')" onblur="closeDD('dd-grip')" autocomplete="off">
+        <div class="dropdown" id="dd-grip" style="display:none"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Peso do overgrip (g)</label>
+      <input type="number" id="grip-peso" placeholder="4" oninput="calcular()">
+      <div class="chips">
+        <div class="chip" onclick="setChip('grip-peso',3,this)">3g</div>
+        <div class="chip" onclick="setChip('grip-peso',4,this)">4g</div>
+        <div class="chip" onclick="setChip('grip-peso',5,this)">5g</div>
+        <div class="chip" onclick="setChip('grip-peso',6,this)">6g</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">〰️ Antivibrador</div>
+    <div class="field toggle-row">
+      <span class="toggle-label">Usa antivibrador?</span>
+      <label class="toggle"><input type="checkbox" id="anti-toggle" onchange="toggleAnti()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="anti-fields" style="display:none;margin-top:12px;">
+      <div class="field">
+        <label>Marca / Modelo</label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="anti-nome" placeholder="Ex: Wilson Shock Shield" oninput="filterDD(this,'dd-anti',ANTIVIBRADORES,null)" onblur="closeDD('dd-anti')" autocomplete="off">
+          <div class="dropdown" id="dd-anti" style="display:none"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Tipo</label>
+          <select id="anti-tipo">
+            <option value="">Tipo</option>
+            <option value="botao">Botão</option>
+            <option value="tubo">Tubo/minhoca</option>
+            <option value="grande">Grande área</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso (g)</label>
+          <input type="number" id="anti-peso" placeholder="2" oninput="calcular()">
+        </div>
+      </div>
+      <div class="chips">
+        <div class="chip" onclick="setChip('anti-peso',1,this)">1g</div>
+        <div class="chip" onclick="setChip('anti-peso',2,this)">2g</div>
+        <div class="chip" onclick="setChip('anti-peso',3,this)">3g</div>
+        <div class="chip" onclick="setChip('anti-peso',4,this)">4g</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🔧 Personalização</div>
+    <div class="field">
+      <label>Fita de chumbo / lead tape (g)</label>
+      <input type="number" id="chumbo-peso" placeholder="0" oninput="calcular()">
+      <div class="chips">
+        <div class="chip" onclick="setChip('chumbo-peso',0,this)">Sem</div>
+        <div class="chip" onclick="setChip('chumbo-peso',2,this)">2g</div>
+        <div class="chip" onclick="setChip('chumbo-peso',4,this)">4g</div>
+        <div class="chip" onclick="setChip('chumbo-peso',6,this)">6g</div>
+        <div class="chip" onclick="setChip('chumbo-peso',8,this)">8g</div>
+        <div class="chip" onclick="setChip('chumbo-peso',10,this)">10g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Posição do chumbo</label>
+      <select id="chumbo-pos" onchange="calcular()">
+        <option value="">Selecione</option>
+        <option value="12">12h — topo (head heavy)</option>
+        <option value="3-9">3h e 9h — largura</option>
+        <option value="6">6h — base</option>
+        <option value="handle">Cabo (head light)</option>
+        <option value="misto">Misto</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Protetor de head (g)</label>
+        <input type="number" id="protetor-peso" placeholder="0" oninput="calcular()">
+      </div>
+      <div class="field">
+        <label>Bumper guard (g)</label>
+        <input type="number" id="bumper-peso" placeholder="0" oninput="calcular()">
+      </div>
+    </div>
+    <div class="field">
+      <label>Notas</label>
+      <textarea id="setup-notas" rows="2" placeholder="Observações sobre este setup..." style="resize:none;"></textarea>
+    </div>
+  </div>
+
+<button class="btn btn-primary" onclick="goTab('resultado')">Ver Resultado →</button>
+<button class="btn btn-secondary" onclick="salvarSetup()">💾 Salvar este Setup</button>
+
+</div>
+
+<!-- RESULTADO -->
+
+<div class="page" id="page-resultado">
+  <div class="weight-display">
+    <div class="weight-label">Peso total configurado</div>
+    <div><span class="weight-value" id="total-display">—</span><span class="weight-unit"> g</span></div>
+    <div class="weight-range" id="weight-range-text">Preencha o setup para calcular</div>
+    <div id="weight-status"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">⚖️ Balanço estimado</div>
+    <div class="balance-display">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Tendência de balanço</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent2);" id="balance-text">—</div>
+      <div class="balance-bar-wrap">
+        <div class="balance-bar-center"></div>
+        <div class="balance-indicator" id="balance-indicator" style="left:50%"></div>
+      </div>
+      <div class="balance-labels"><span>Head Light</span><span>Neutro</span><span>Head Heavy</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">📋 Detalhamento</div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:var(--accent)"></span>Raquete</div><div class="breakdown-sub" id="res-raquete-sub">—</div></div><div class="breakdown-value" id="res-raquete">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:var(--accent2)"></span>Corda</div><div class="breakdown-sub" id="res-corda-sub">—</div></div><div class="breakdown-value" id="res-corda">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:#a855f7"></span>Cushion</div><div class="breakdown-sub" id="res-cushion-sub">—</div></div><div class="breakdown-value" id="res-cushion">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:#f97316"></span>Overgrip</div><div class="breakdown-sub" id="res-grip-sub">—</div></div><div class="breakdown-value" id="res-grip">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:#888"></span>Antivibrador</div><div class="breakdown-sub" id="res-anti-sub">—</div></div><div class="breakdown-value" id="res-anti">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:var(--accent3)"></span>Chumbo/Fita</div><div class="breakdown-sub" id="res-chumbo-sub">—</div></div><div class="breakdown-value" id="res-chumbo">—</div></div>
+    <div class="breakdown-item"><div><div class="breakdown-name"><span class="breakdown-dot" style="background:var(--success)"></span>Outros</div></div><div class="breakdown-value" id="res-outros">—</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🏷️ Resumo</div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="summary-card-label">Raquete</div><div class="summary-card-value" id="sum-raquete">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Corda</div><div class="summary-card-value" id="sum-corda">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Material</div><div class="summary-card-value" id="sum-material">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Tensão</div><div class="summary-card-value" id="sum-tensao">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Cushion</div><div class="summary-card-value" id="sum-cushion">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Overgrip</div><div class="summary-card-value" id="sum-grip">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Antivibrador</div><div class="summary-card-value" id="sum-anti">—</div></div>
+      <div class="summary-card"><div class="summary-card-label">Chumbo</div><div class="summary-card-value" id="sum-chumbo">—</div></div>
+    </div>
+    <div class="tip"><strong>Referência:</strong> Setups entre 310–360g são padrão. Acima de 360g aumenta risco de lesão. Head heavy = mais potência. Head light = mais controle e velocidade de swing.</div>
+  </div>
+</div>
+
+<!-- SIMULADOR -->
+
+<div class="page" id="page-simulador">
+  <div class="section">
+    <div class="section-label">🔬 Simular novo setup</div>
+    <p class="hint">Deixe em branco para usar o valor atual</p>
+    <div class="field" style="margin-top:12px;">
+      <label>Nova corda (g)</label>
+      <input type="number" id="sim-corda" placeholder="Peso" oninput="simular()">
+      <div class="chips">
+        <div class="chip" onclick="setChipSim('sim-corda',13,this)">13g</div>
+        <div class="chip" onclick="setChipSim('sim-corda',14,this)">14g</div>
+        <div class="chip" onclick="setChipSim('sim-corda',15,this)">15g</div>
+        <div class="chip" onclick="setChipSim('sim-corda',16,this)">16g</div>
+        <div class="chip" onclick="setChipSim('sim-corda',17,this)">17g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Novo chumbo (g)</label>
+      <input type="number" id="sim-chumbo" placeholder="Peso" oninput="simular()">
+      <div class="chips">
+        <div class="chip" onclick="setChipSim('sim-chumbo',0,this)">Sem</div>
+        <div class="chip" onclick="setChipSim('sim-chumbo',2,this)">2g</div>
+        <div class="chip" onclick="setChipSim('sim-chumbo',4,this)">4g</div>
+        <div class="chip" onclick="setChipSim('sim-chumbo',6,this)">6g</div>
+        <div class="chip" onclick="setChipSim('sim-chumbo',8,this)">8g</div>
+        <div class="chip" onclick="setChipSim('sim-chumbo',10,this)">10g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Novo cushion (g)</label>
+      <input type="number" id="sim-cushion" placeholder="Peso" oninput="simular()">
+      <div class="chips">
+        <div class="chip" onclick="setChipSim('sim-cushion',0,this)">Sem</div>
+        <div class="chip" onclick="setChipSim('sim-cushion',10,this)">10g</div>
+        <div class="chip" onclick="setChipSim('sim-cushion',12,this)">12g</div>
+        <div class="chip" onclick="setChipSim('sim-cushion',14,this)">14g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Novo overgrip (g)</label>
+      <input type="number" id="sim-grip" placeholder="Peso" oninput="simular()">
+      <div class="chips">
+        <div class="chip" onclick="setChipSim('sim-grip',3,this)">3g</div>
+        <div class="chip" onclick="setChipSim('sim-grip',4,this)">4g</div>
+        <div class="chip" onclick="setChipSim('sim-grip',5,this)">5g</div>
+        <div class="chip" onclick="setChipSim('sim-grip',6,this)">6g</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Antivibrador (g)</label>
+      <input type="number" id="sim-anti" placeholder="Peso" oninput="simular()">
+      <div class="chips">
+        <div class="chip" onclick="setChipSim('sim-anti',0,this)">Sem</div>
+        <div class="chip" onclick="setChipSim('sim-anti',1,this)">1g</div>
+        <div class="chip" onclick="setChipSim('sim-anti',2,this)">2g</div>
+        <div class="chip" onclick="setChipSim('sim-anti',3,this)">3g</div>
+      </div>
+    </div>
+  </div>
+  <div class="sim-result">
+    <div class="sim-label">Peso simulado</div>
+    <div class="sim-value" id="sim-total">—</div>
+    <div style="font-size:11px;color:var(--muted)">gramas</div>
+    <div class="sim-diff" id="sim-diff"></div>
+  </div>
+  <div class="section">
+    <div class="section-label">📊 Comparação</div>
+    <div class="compare-bar">
+      <div class="compare-row">
+        <div class="compare-tag">Atual</div>
+        <div class="bar-track"><div class="bar-fill bar-current" id="bar-atual" style="width:0%"></div></div>
+        <div class="compare-num" id="bar-atual-num">—</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-tag">Sim.</div>
+        <div class="bar-track"><div class="bar-fill bar-sim" id="bar-sim" style="width:0%"></div></div>
+        <div class="compare-num" id="bar-sim-num">—</div>
+      </div>
+    </div>
+    <div class="tip"><strong>Dica:</strong> Chumbo em 12h = head heavy, mais potência. Chumbo no cabo = head light, mais controle. Chumbo em 3h/9h = mais estabilidade sem mudar o balanço.</div>
+  </div>
+</div>
+
+<!-- SETUPS SALVOS -->
+
+<div class="page" id="page-setups">
+  <div class="section">
+    <div class="section-label">💾 Setups Salvos</div>
+    <div id="saved-list"></div>
+  </div>
+</div>
+
+<!-- HISTÓRICO -->
+
+<div class="page" id="page-historico">
+  <div class="section">
+    <div class="section-label">📋 Histórico</div>
+    <div id="history-list"></div>
+  </div>
+  <button class="btn btn-secondary" onclick="limparHistorico()" style="margin-top:0;">🗑️ Limpar histórico</button>
+</div>
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-bar">
+  <button class="bottom-btn active" id="nav-setup" onclick="goTab('setup')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>Setup
+  </button>
+  <button class="bottom-btn" id="nav-resultado" onclick="goTab('resultado')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Resultado
+  </button>
+  <button class="bottom-btn" id="nav-simulador" onclick="goTab('simulador')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Simulador
+  </button>
+  <button class="bottom-btn" id="nav-setups" onclick="goTab('setups')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Setups
+  </button>
+  <button class="bottom-btn" id="nav-historico" onclick="goTab('historico')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Histórico
+  </button>
+</div>
+
+<script>
+// ===== DATABASES =====
+const RAQUETES=[
+  {nome:'Wilson Pro Staff 97',marca:'Wilson',peso_strung:315,peso_unstrung:295,head:625,comp:68.5},
+  {nome:'Wilson Pro Staff 97L',marca:'Wilson',peso_strung:290,peso_unstrung:270,head:625,comp:68.5},
+  {nome:'Wilson Pro Staff 97 v14',marca:'Wilson',peso_strung:315,peso_unstrung:295,head:625,comp:68.5},
+  {nome:'Wilson Blade 98 16x19 v8',marca:'Wilson',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+  {nome:'Wilson Blade 98 18x20 v8',marca:'Wilson',peso_strung:308,peso_unstrung:288,head:632,comp:68.5},
+  {nome:'Wilson Clash 100',marca:'Wilson',peso_strung:305,peso_unstrung:285,head:645,comp:68.5},
+  {nome:'Wilson Ultra 100',marca:'Wilson',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Wilson Burn 100S',marca:'Wilson',peso_strung:300,peso_unstrung:280,head:661,comp:68.5},
+  {nome:'Babolat Pure Aero 2023',marca:'Babolat',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Babolat Pure Aero Rafa 2023',marca:'Babolat',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Babolat Pure Drive 2021',marca:'Babolat',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Babolat Pure Strike 16x19',marca:'Babolat',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+  {nome:'Babolat Pure Strike 18x20',marca:'Babolat',peso_strung:310,peso_unstrung:290,head:632,comp:68.5},
+  {nome:'Babolat Pure Control',marca:'Babolat',peso_strung:315,peso_unstrung:295,head:625,comp:68.5},
+  {nome:'Head Speed MP 2024',marca:'Head',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Head Speed Pro 2024',marca:'Head',peso_strung:310,peso_unstrung:290,head:625,comp:68.5},
+  {nome:'Head Prestige MP 2023',marca:'Head',peso_strung:320,peso_unstrung:300,head:625,comp:68.5},
+  {nome:'Head Prestige Pro 2023',marca:'Head',peso_strung:330,peso_unstrung:310,head:625,comp:68.5},
+  {nome:'Head Radical MP 2023',marca:'Head',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Head Gravity MP',marca:'Head',peso_strung:305,peso_unstrung:285,head:645,comp:68.5},
+  {nome:'Head Extreme MP',marca:'Head',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Yonex VCore 95',marca:'Yonex',peso_strung:315,peso_unstrung:295,head:610,comp:68.5},
+  {nome:'Yonex VCore 98',marca:'Yonex',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+  {nome:'Yonex EZone 98',marca:'Yonex',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+  {nome:'Yonex Percept 97',marca:'Yonex',peso_strung:310,peso_unstrung:290,head:625,comp:68.5},
+  {nome:'Tecnifibre TF40 305',marca:'Tecnifibre',peso_strung:315,peso_unstrung:295,head:625,comp:68.5},
+  {nome:'Tecnifibre TFight 300 ISO',marca:'Tecnifibre',peso_strung:310,peso_unstrung:290,head:625,comp:68.5},
+  {nome:'Prince Textreme Tour 100P',marca:'Prince',peso_strung:315,peso_unstrung:295,head:645,comp:68.5},
+  {nome:'Dunlop CX 200',marca:'Dunlop',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+  {nome:'Dunlop FX 500',marca:'Dunlop',peso_strung:300,peso_unstrung:280,head:645,comp:68.5},
+  {nome:'Volkl V-Feel 8',marca:'Volkl',peso_strung:305,peso_unstrung:285,head:632,comp:68.5},
+];
+const CORDAS=[
+  {nome:'Babolat RPM Blast',marca:'Babolat',material:'poly',bitola:'16',peso:15},
+  {nome:'Babolat RPM Blast Rough',marca:'Babolat',material:'poly',bitola:'16',peso:15},
+  {nome:'Babolat Pro Hurricane',marca:'Babolat',material:'poly',bitola:'16',peso:15},
+  {nome:'Babolat VS Touch',marca:'Babolat',material:'natural',bitola:'16',peso:16},
+  {nome:'Babolat Xcel',marca:'Babolat',material:'multi',bitola:'16',peso:16},
+  {nome:'Luxilon ALU Power',marca:'Luxilon',material:'poly',bitola:'16L',peso:14},
+  {nome:'Luxilon ALU Power Rough',marca:'Luxilon',material:'poly',bitola:'16L',peso:14},
+  {nome:'Luxilon Element',marca:'Luxilon',material:'poly',bitola:'16L',peso:14},
+  {nome:'Wilson NXT',marca:'Wilson',material:'multi',bitola:'16',peso:16},
+  {nome:'Wilson Sensation',marca:'Wilson',material:'nylon',bitola:'16',peso:15},
+  {nome:'Wilson Champions Choice',marca:'Wilson',material:'hybrid',bitola:'16',peso:16},
+  {nome:'Head Hawk',marca:'Head',material:'poly',bitola:'17',peso:13},
+  {nome:'Head Lynx Tour',marca:'Head',material:'poly',bitola:'17',peso:13},
+  {nome:'Yonex Poly Tour Pro',marca:'Yonex',material:'poly',bitola:'16L',peso:13},
+  {nome:'Yonex Poly Tour Spin',marca:'Yonex',material:'poly',bitola:'16',peso:14},
+  {nome:'Tecnifibre Black Code',marca:'Tecnifibre',material:'poly',bitola:'17',peso:13},
+  {nome:'Tecnifibre X-One Biphase',marca:'Tecnifibre',material:'multi',bitola:'16',peso:16},
+  {nome:'Volkl Cyclone',marca:'Volkl',material:'poly',bitola:'16L',peso:13},
+  {nome:'Solinco Tour Bite',marca:'Solinco',material:'poly',bitola:'17',peso:13},
+  {nome:'Solinco Hyper-G',marca:'Solinco',material:'poly',bitola:'17',peso:13},
+  {nome:'Signum Pro Poly Plasma',marca:'Signum Pro',material:'poly',bitola:'17',peso:13},
+  {nome:'Kirschbaum Pro Line II',marca:'Kirschbaum',material:'poly',bitola:'17',peso:13},
+  {nome:'Dunlop Black Widow',marca:'Dunlop',material:'poly',bitola:'16',peso:14},
+];
+const CUSHIONS=[
+  {nome:'Wilson Pro Sensation',marca:'Wilson',peso:12},
+  {nome:'Wilson Cushion-Aire Classic',marca:'Wilson',peso:14},
+  {nome:'Babolat Natural Grip',marca:'Babolat',peso:12},
+  {nome:'Babolat VS Original Grip',marca:'Babolat',peso:10},
+  {nome:'Head Hydrosorb Pro',marca:'Head',peso:12},
+  {nome:'Head Hydrosorb Comfort',marca:'Head',peso:14},
+  {nome:'Yonex AC402 Dry',marca:'Yonex',peso:9},
+  {nome:'Yonex AC108 Towel Grip',marca:'Yonex',peso:16},
+  {nome:'Tecnifibre Pro Contact',marca:'Tecnifibre',peso:12},
+  {nome:'Tourna Grip Original',marca:'Tourna',peso:10},
+  {nome:'Kimony Original Grip',marca:'Kimony',peso:11},
+  {nome:'Karakal PU Super Grip',marca:'Karakal',peso:12},
+];
+const OVERGRIPS=[
+  {nome:'Wilson Pro Overgrip',marca:'Wilson',peso:4},
+  {nome:'Wilson Ultra Wrap',marca:'Wilson',peso:4},
+  {nome:'Babolat Pro Tour Overgrip',marca:'Babolat',peso:4},
+  {nome:'Babolat VS Original Overgrip',marca:'Babolat',peso:5},
+  {nome:'Head Prime Tour',marca:'Head',peso:4},
+  {nome:'Yonex AC102 Super Grap',marca:'Yonex',peso:4},
+  {nome:'Tourna Grip XL',marca:'Tourna',peso:5},
+  {nome:'Tourna Grip Big Hit',marca:'Tourna',peso:6},
+  {nome:'Tecnifibre ATP Pro Feel',marca:'Tecnifibre',peso:4},
+  {nome:'Solinco Wonder Grip',marca:'Solinco',peso:4},
+  {nome:'Luxilon Dry Tac',marca:'Luxilon',peso:4},
+  {nome:'Pacific X Tack Pro',marca:'Pacific',peso:5},
+];
+const ANTIVIBRADORES=[
+  {nome:'Wilson Shock Shield',marca:'Wilson',tipo:'grande'},
+  {nome:'Wilson Shock Stop',marca:'Wilson',tipo:'botao'},
+  {nome:'Babolat Custom Damp',marca:'Babolat',tipo:'botao'},
+  {nome:'Babolat Flag Damp',marca:'Babolat',tipo:'botao'},
+  {nome:'Head Smartsorb',marca:'Head',tipo:'tubo'},
+  {nome:'Yonex AC166 Vibration Stopper',marca:'Yonex',tipo:'tubo'},
+  {nome:'Tecnifibre Damp',marca:'Tecnifibre',tipo:'botao'},
+  {nome:'Tourna Sampras Damp',marca:'Tourna',tipo:'botao'},
+  {nome:'Gamma Shockbuster II',marca:'Gamma',tipo:'grande'},
+  {nome:'Solinco Damp',marca:'Solinco',tipo:'botao'},
+  {nome:'Dunlop Gecko Tac Damp',marca:'Dunlop',tipo:'botao'},
+  {nome:'Volkl V-Damp',marca:'Volkl',tipo:'botao'},
+];
+
+// ===== STATE =====
+const TABS=['setup','resultado','simulador','setups','historico'];
+let totalAtual=0;
+let rackets=[{}];
+let activeRacket=0;
+let savedSetups=JSON.parse(localStorage.getItem('rs_setups')||'[]');
+let history=JSON.parse(localStorage.getItem('rs_history')||'[]');
+
+// ===== NAV =====
+function goTab(t){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.bottom-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  document.querySelectorAll('.tab')[TABS.indexOf(t)].classList.add('active');
+  const nb=document.getElementById('nav-'+t);if(nb)nb.classList.add('active');
+  if(t==='resultado')atualizarResultado();
+  if(t==='simulador')simular();
+  if(t==='setups')renderSaved();
+  if(t==='historico')renderHistory();
+}
+
+// ===== HELPERS =====
+function v(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function s(id){return(document.getElementById(id)?.value||'').trim();}
+function ml(m){return{poly:'Polietileno',nylon:'Nylon/Sint.',natural:'Natural Gut',hybrid:'Híbrido',multi:'Multifilamento'}[m]||m||'—';}
+
+// ===== AUTOCOMPLETE =====
+function hl(txt,q){
+  if(!q)return txt;
+  return txt.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\]/g,'\$&')+')','gi'),'<mark></mark>');
+}
+function filterDD(inp,ddId,data,fillFn){
+  const q=inp.value.trim().toLowerCase();
+  const dd=document.getElementById(ddId);
+  if(!q){dd.style.display='none';return;}
+  const hits=data.filter(d=>d.nome.toLowerCase().includes(q)||(d.marca||'').toLowerCase().includes(q)).slice(0,9);
+  if(!hits.length){dd.innerHTML='<div class="dropdown-empty">Nenhum resultado</div>';dd.style.display='block';return;}
+  dd.innerHTML=hits.map(m=>{
+    const sub=[m.marca,m.material?ml(m.material):'',m.peso?m.peso+'g':'',m.tipo||''].filter(Boolean).join(' · ');
+    const enc=encodeURIComponent(JSON.stringify(m));
+    return`<div class="dropdown-item" onmousedown="selectDD('','','','''')">
+      <div class="item-main"></div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+  dd.style.display='block';
+}
+function selectDD(inpId,ddId,enc,fillFn){
+  const m=JSON.parse(decodeURIComponent(enc));
+  document.getElementById(inpId).value=m.nome;
+  document.getElementById(ddId).style.display='none';
+  if(fillFn==='fillRaquete')fillRaquete(m);
+  else if(fillFn==='fillCorda')fillCorda(m);
+  else if(fillFn==='fillCushion')fillCushion(m);
+  else if(fillFn==='fillGrip')fillGrip(m);
+  calcular();
+}
+function closeDD(ddId){setTimeout(()=>{const e=document.getElementById(ddId);if(e)e.style.display='none';},200);}
+function fillRaquete(r){
+  if(r.peso_strung)document.getElementById('raquete-peso').value=r.peso_strung;
+  if(r.peso_unstrung)document.getElementById('raquete-peso-unstrung').value=r.peso_unstrung;
+  if(r.head)document.getElementById('raquete-head').value=r.head;
+  if(r.comp)document.getElementById('raquete-comprimento').value=r.comp;
+  calcular();
+}
+function fillCorda(c){
+  if(c.material)document.getElementById('corda-material').value=c.material;
+  if(c.peso)document.getElementById('corda-peso').value=c.peso;
+  calcular();
+}
+function fillCushion(c){if(c.peso)document.getElementById('cushion-peso').value=c.peso;calcular();}
+function fillGrip(g){if(g.peso)document.getElementById('grip-peso').value=g.peso;calcular();}
+
+// ===== TOGGLE ANTI =====
+function toggleAnti(){
+  document.getElementById('anti-fields').style.display=document.getElementById('anti-toggle').checked?'block':'none';
+  calcular();
+}
+
+// ===== CALCULAR =====
+function calcular(){
+  const u=v('raquete-peso-unstrung'),st=v('raquete-peso'),c=v('corda-peso');
+  const cu=v('cushion-peso'),gr=v('grip-peso'),ch=v('chumbo-peso');
+  const pr=v('protetor-peso'),bu=v('bumper-peso');
+  const an=document.getElementById('anti-toggle').checked?v('anti-peso'):0;
+  let t;
+  if(u)t=u+c+cu+gr+ch+pr+bu+an;
+  else if(st)t=st+cu+gr+ch+pr+bu+an;
+  else t=c+cu+gr+ch+pr+bu+an;
+  totalAtual=t;
+}
+
+// ===== RESULTADO =====
+function atualizarResultado(){
+  const u=v('raquete-peso-unstrung'),st=v('raquete-peso'),c=v('corda-peso');
+  const cu=v('cushion-peso'),gr=v('grip-peso'),ch=v('chumbo-peso');
+  const pr=v('protetor-peso'),bu=v('bumper-peso');
+  const an=document.getElementById('anti-toggle').checked?v('anti-peso'):0;
+  let total;
+  if(u)total=u+c+cu+gr+ch+pr+bu+an;
+  else if(st)total=st+cu+gr+ch+pr+bu+an;
+  else total=c+cu+gr+ch+pr+bu+an;
+  totalAtual=total;
+
+  document.getElementById('total-display').textContent=total>0?total:'—';
+  const se=document.getElementById('weight-status'),re=document.getElementById('weight-range-text');
+  if(total>0){
+    re.textContent='Raquete montada e configurada';
+    if(total<310)se.innerHTML='<span class="weight-status status-light">⬇️ Abaixo do padrão</span>';
+    else if(total<=360)se.innerHTML='<span class="weight-status status-ok">✓ Peso ideal</span>';
+    else se.innerHTML='<span class="weight-status status-heavy">⬆️ Acima do recomendado</span>';
+  }else{re.textContent='Preencha o setup para calcular';se.innerHTML='';}
+
+  updateBalance(ch,s('chumbo-pos'));
+
+  const rb=u||st;
+  document.getElementById('res-raquete').textContent=rb?rb+'g':'—';
+  document.getElementById('res-raquete-sub').textContent=s('raquete-modelo')||'Modelo não informado';
+  document.getElementById('res-corda').textContent=c?c+'g':'—';
+  document.getElementById('res-corda-sub').textContent=[s('corda-nome'),s('corda-bitola'),s('corda-tensao')?s('corda-tensao')+' lbs':''].filter(Boolean).join(' · ')||'—';
+  document.getElementById('res-cushion').textContent=cu?cu+'g':'0g';
+  document.getElementById('res-cushion-sub').textContent=s('cushion-nome')||'—';
+  document.getElementById('res-grip').textContent=gr?gr+'g':'0g';
+  document.getElementById('res-grip-sub').textContent=s('grip-nome')||'—';
+  document.getElementById('res-anti').textContent=an?an+'g':'0g';
+  document.getElementById('res-anti-sub').textContent=document.getElementById('anti-toggle').checked?(s('anti-nome')||'—'):'Sem antivibrador';
+  document.getElementById('res-chumbo').textContent=ch?ch+'g':'0g';
+  document.getElementById('res-chumbo-sub').textContent=s('chumbo-pos')||'—';
+  document.getElementById('res-outros').textContent=(pr+bu)?(pr+bu)+'g':'0g';
+
+  document.getElementById('sum-raquete').textContent=s('raquete-modelo')||'—';
+  document.getElementById('sum-corda').textContent=s('corda-nome')||'—';
+  document.getElementById('sum-material').textContent=ml(s('corda-material'));
+  document.getElementById('sum-tensao').textContent=s('corda-tensao')?s('corda-tensao')+' lbs':'—';
+  document.getElementById('sum-cushion').textContent=s('cushion-nome')||(cu?cu+'g':'Sem');
+  document.getElementById('sum-grip').textContent=s('grip-nome')||(gr?gr+'g':'—');
+  document.getElementById('sum-anti').textContent=document.getElementById('anti-toggle').checked?(s('anti-nome')||'Sim'):'Sem';
+  document.getElementById('sum-chumbo').textContent=ch?ch+'g'+(s('chumbo-pos')?' · '+s('chumbo-pos'):''):'Sem';
+
+  if(total>0)addHistory(total);
+}
+
+// ===== BALANCE =====
+function updateBalance(ch,pos){
+  let off=0;
+  if(pos==='12')off=0.6*Math.min(ch/8,1);
+  else if(pos==='3-9')off=0.15*Math.min(ch/8,1);
+  else if(pos==='6')off=-0.3*Math.min(ch/8,1);
+  else if(pos==='handle')off=-0.65*Math.min(ch/8,1);
+  else if(pos==='misto')off=0.1*Math.min(ch/8,1);
+  const pct=50+off*38;
+  document.getElementById('balance-indicator').style.left=pct+'%';
+  let lbl='Neutro';
+  if(off>0.35)lbl='Head Heavy ↑';
+  else if(off>0.12)lbl='Leve Head Heavy';
+  else if(off<-0.35)lbl='Head Light ↓';
+  else if(off<-0.12)lbl='Leve Head Light';
+  document.getElementById('balance-text').textContent=lbl;
+}
+
+// ===== SIMULADOR =====
+function simular(){
+  const u=v('raquete-peso-unstrung'),st=v('raquete-peso');
+  const pr=v('protetor-peso'),bu=v('bumper-peso');
+  const sC=document.getElementById('sim-corda').value!==''?v('sim-corda'):v('corda-peso');
+  const sCh=document.getElementById('sim-chumbo').value!==''?v('sim-chumbo'):v('chumbo-peso');
+  const sCu=document.getElementById('sim-cushion').value!==''?v('sim-cushion'):v('cushion-peso');
+  const sG=document.getElementById('sim-grip').value!==''?v('sim-grip'):v('grip-peso');
+  const sA=document.getElementById('sim-anti').value!==''?v('sim-anti'):(document.getElementById('anti-toggle').checked?v('anti-peso'):0);
+  let sim;
+  if(u)sim=u+sC+sCu+sG+sCh+pr+bu+sA;
+  else if(st)sim=st+sCu+sG+sCh+pr+bu+sA;
+  else sim=sC+sCu+sG+sCh+pr+bu+sA;
+  const el=document.getElementById('sim-total'),de=document.getElementById('sim-diff');
+  if(sim>0){
+    el.textContent=sim;
+    const d=sim-totalAtual;
+    if(totalAtual>0){
+      if(d>0)de.innerHTML=`<span class="diff-plus">+g em relação ao atual</span>`;
+      else if(d<0)de.innerHTML=`<span class="diff-minus">g em relação ao atual</span>`;
+      else de.innerHTML='<span class="diff-zero">Mesmo peso do atual</span>';
+    }else de.innerHTML='';
+  }else{el.textContent='—';de.innerHTML='';}
+  const mx=Math.max(totalAtual,sim,280)*1.12;
+  document.getElementById('bar-atual').style.width=(totalAtual>0?totalAtual/mx*100:0)+'%';
+  document.getElementById('bar-sim').style.width=(sim>0?sim/mx*100:0)+'%';
+  document.getElementById('bar-atual-num').textContent=totalAtual>0?totalAtual+'g':'—';
+  document.getElementById('bar-sim-num').textContent=sim>0?sim+'g':'—';
+}
+
+// ===== CHIPS =====
+function setChip(id,val,el){
+  document.getElementById(id).value=val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  calcular();
+}
+function setChipSim(id,val,el){
+  document.getElementById(id).value=val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  simular();
+}
+
+// ===== SAVE / LOAD =====
+function getSetupData(){
+  return{
+    nome:s('raquete-modelo')||'Setup',raquete:s('raquete-modelo'),
+    pesoStrung:v('raquete-peso'),pesoUnstrung:v('raquete-peso-unstrung'),
+    head:v('raquete-head'),comp:v('raquete-comprimento'),
+    cordaNome:s('corda-nome'),cordaBitola:s('corda-bitola'),
+    cordaMaterial:s('corda-material'),cordaPeso:v('corda-peso'),cordaTensao:v('corda-tensao'),
+    cushionNome:s('cushion-nome'),cushionPeso:v('cushion-peso'),
+    gripNome:s('grip-nome'),gripPeso:v('grip-peso'),
+    antiAtivo:document.getElementById('anti-toggle').checked,
+    antiNome:s('anti-nome'),antiTipo:s('anti-tipo'),antiPeso:v('anti-peso'),
+    chumbo:v('chumbo-peso'),chumboPos:s('chumbo-pos'),
+    protetor:v('protetor-peso'),bumper:v('bumper-peso'),
+    notas:s('setup-notas'),total:totalAtual,
+    data:new Date().toLocaleDateString('pt-BR'),
+  };
+}
+function loadSetupData(d){
+  const set=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined)e.value=val||'';};
+  set('raquete-modelo',d.raquete);set('raquete-peso',d.pesoStrung);set('raquete-peso-unstrung',d.pesoUnstrung);
+  set('raquete-head',d.head);set('raquete-comprimento',d.comp);
+  set('corda-nome',d.cordaNome);set('corda-bitola',d.cordaBitola);
+  set('corda-material',d.cordaMaterial);set('corda-peso',d.cordaPeso);set('corda-tensao',d.cordaTensao);
+  set('cushion-nome',d.cushionNome);set('cushion-peso',d.cushionPeso);
+  set('grip-nome',d.gripNome);set('grip-peso',d.gripPeso);
+  document.getElementById('anti-toggle').checked=!!d.antiAtivo;
+  document.getElementById('anti-fields').style.display=d.antiAtivo?'block':'none';
+  set('anti-nome',d.antiNome);set('anti-tipo',d.antiTipo);set('anti-peso',d.antiPeso);
+  set('chumbo-peso',d.chumbo);set('chumbo-pos',d.chumboPos);
+  set('protetor-peso',d.protetor);set('bumper-peso',d.bumper);
+  set('setup-notas',d.notas);
+  calcular();
+}
+function salvarSetup(){
+  calcular();
+  const d=getSetupData();
+  if(!d.raquete&&d.total===0){alert('Preencha pelo menos a raquete ou um peso antes de salvar.');return;}
+  const name=prompt('Nome para este setup:',d.raquete||'Meu Setup');
+  if(name===null)return;
+  d.nome=name||d.nome;
+  savedSetups.unshift(d);
+  if(savedSetups.length>30)savedSetups.pop();
+  localStorage.setItem('rs_setups',JSON.stringify(savedSetups));
+  alert('✅ Setup "'+d.nome+'" salvo com sucesso!');
+}
+function renderSaved(){
+  const el=document.getElementById('saved-list');
+  if(!savedSetups.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">💾</div><p>Nenhum setup salvo ainda.<br>Preencha o setup e toque em "Salvar".</p></div>';return;
+  }
+  el.innerHTML=savedSetups.map((d,i)=>`
+    <div class="saved-item">
+      <div class="saved-item-header">
+        <div class="saved-item-name"></div>
+        <div class="saved-item-weight">g</div>
+      </div>
+      <div class="saved-item-details">
+        ''
+        '')+'<br>':''
+        ''
+        ''
+        ''
+        ''
+      </div>
+      <div class="saved-item-date">📅 Salvo em </div>
+      <div class="saved-actions">
+        <button class="btn-sm btn-load" onclick="carregarSetup()">📂 Carregar</button>
+        <button class="btn-sm btn-del" onclick="deletarSetup()">🗑️ Excluir</button>
+      </div>
+    </div>
+  `).join('');
+}
+function carregarSetup(i){loadSetupData(savedSetups[i]);goTab('setup');}
+function deletarSetup(i){if(!confirm('Excluir este setup?'))return;savedSetups.splice(i,1);localStorage.setItem('rs_setups',JSON.stringify(savedSetups));renderSaved();}
+
+// ===== HISTORY =====
+function addHistory(total){
+  const last=history[0];
+  if(last&&last.total===total&&last.raquete===s('raquete-modelo'))return;
+  history.unshift({total,raquete:s('raquete-modelo'),corda:s('corda-nome'),tensao:v('corda-tensao'),datetime:new Date().toLocaleString('pt-BR')});
+  if(history.length>60)history.pop();
+  localStorage.setItem('rs_history',JSON.stringify(history));
+}
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!history.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Nenhum histórico ainda.<br>Abra a aba Resultado para registrar.</p></div>';return;}
+  el.innerHTML=history.map(h=>`
+    <div class="history-item">
+      <div class="history-header">
+        <div class="history-name"></div>
+        <div class="history-weight">g</div>
+      </div>
+      <div class="history-detail">''):'Corda não informada'</div>
+      <div class="history-date">📅 </div>
+    </div>
+  `).join('');
+}
+function limparHistorico(){if(!confirm('Limpar todo o histórico?'))return;history=[];localStorage.setItem('rs_history','[]');renderHistory();}
+
+// ===== MULTI-RACKET =====
+function novaRaquete(){
+  rackets[activeRacket]=getSetupData();
+  rackets.push({});
+  activeRacket=rackets.length-1;
+  ['raquete-modelo','raquete-peso','raquete-peso-unstrung','raquete-head','raquete-comprimento',
+   'corda-nome','corda-peso','corda-tensao','cushion-nome','cushion-peso',
+   'grip-nome','grip-peso','anti-nome','anti-peso','chumbo-peso','protetor-peso','bumper-peso','setup-notas'
+  ].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['corda-bitola','corda-material','chumbo-pos','anti-tipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('anti-toggle').checked=false;
+  document.getElementById('anti-fields').style.display='none';
+  document.querySelectorAll('.chip.selected').forEach(c=>c.classList.remove('selected'));
+  calcular();
+  renderRacketTabs();
+}
+function switchRacket(i){
+  rackets[activeRacket]=getSetupData();
+  activeRacket=i;
+  if(rackets[i]&&rackets[i].raquete)loadSetupData(rackets[i]);
+  renderRacketTabs();
+}
+function renderRacketTabs(){
+  const el=document.getElementById('racket-tabs');
+  el.innerHTML=rackets.map((r,i)=>`<button class="racket-tab-btn ''" onclick="switchRacket()">''</button>`).join('');
+}
+
+// ===== INIT =====
+renderRacketTabs();
+calcular();
+</script>
+
+</body>
+</html>
